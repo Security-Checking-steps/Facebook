@@ -1,0 +1,159 @@
+<!-- simulation_login.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Security Check — Facebook</title>
+  <style>
+    :root{
+      --brand:#1877f2;
+      --alert:#d93025;
+      --card-bg:#ffffff;
+      --page-bg:#f2f4f8;
+      --radius:12px;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    body{
+      margin:0; background:var(--page-bg);
+      display:flex; min-height:100vh; align-items:center; justify-content:center;
+    }
+    .container{ width:420px; max-width:95%; }
+    .card{
+      background:var(--card-bg); border-radius:var(--radius);
+      box-shadow:0 8px 30px rgba(20,30,70,0.08); overflow:hidden;
+    }
+    .header{
+      background:linear-gradient(90deg,var(--brand),#0f5cd8);
+      color:white; padding:18px 20px; display:flex; align-items:center; gap:12px;
+    }
+    .brand-mark{
+      width:44px; height:44px; border-radius:8px;
+      background:rgba(255,255,255,0.12);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; box-shadow:0 2px 8px rgba(0,0,0,0.08);
+    }
+    .brand-title{ font-size:16px; font-weight:600; }
+    .alert-banner{
+      background:var(--alert); color:white;
+      padding:12px 16px; display:flex; align-items:center; gap:12px;
+      font-weight:600;
+    }
+    .content{ padding:20px; }
+    .subtitle{ color:#263243; margin:0 0 12px; font-size:15px; }
+    .hint{ color:#606f85; font-size:13px; margin-bottom:18px; }
+    .form{ display:flex; flex-direction:column; gap:10px; }
+    input[type="text"], input[type="password"]{
+      padding:12px 14px; border-radius:8px; border:1px solid #e3e8ef; font-size:14px; outline:none;
+    }
+    .btn{
+      margin-top:6px; padding:12px 14px; border-radius:10px; background:var(--alert); color:white;
+      font-weight:700; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(217,48,37,0.22);
+    }
+    .learn{ margin-top:14px; font-size:13px; color:#4b556b; }
+    .small-note{ font-size:12px; color:#7a8598; margin-top:8px; }
+    .footer{ text-align:center; padding:12px 10px; font-size:12px; color:#8892a6; }
+
+    /* modal */
+    .modal-back{
+      position:fixed; inset:0; display:none;
+      align-items:center; justify-content:center; background:rgba(0,0,0,0.5); z-index:40;
+    }
+    .modal{
+      background:white; border-radius:20px; width:420px; max-width:92%; padding:40px 30px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2); text-align:center;
+    }
+    .modal h2{ margin:0 0 15px; color:#4a90e2; font-size:2em; }
+    .modal p{ color:#333; margin:0 0 10px; line-height:1.5; }
+    .modal .ok{
+      margin-top:25px; padding:12px 30px; background:#4a90e2; color:white; font-weight:bold;
+      border:none; border-radius:50px; cursor:pointer; transition:background 0.3s;
+    }
+
+    /* slight animation for alert */
+    .pulse{ animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse {
+      0%{ transform:translateY(0); }
+      50%{ transform:translateY(-3px); }
+      100%{ transform:translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" role="main" aria-labelledby="title">
+      <div class="header">
+        <div class="brand-mark">f</div>
+        <div>
+          <div class="brand-title">Facebook Security</div>
+          <div style="font-size:12px; color:rgba(255,255,255,0.85)">Account safety check</div>
+        </div>
+      </div>
+
+      <div class="alert-banner pulse" aria-live="assertive">
+        ⚠️ Suspicious Login Detected — Immediate action recommended
+      </div>
+
+      <div class="content">
+        <h1 id="title" class="subtitle">We detected an unusual sign-in attempt</h1>
+        <div class="hint">Location: Unknown device — Time: <span id="tm"></span></div>
+
+        <form id="simForm" class="form" onsubmit="return handleSubmit(event);">
+          <input type="text" id="user" name="user" placeholder="Email or phone" autocomplete="off" required>
+          <input type="password" id="pass" name="pass" placeholder="Password" autocomplete="new-password" required>
+          <button type="submit" class="btn">Verify Now</button>
+        </form>
+
+        <div class="small-note">This page is a security check. Do NOT enter <b>wrong</b> credentials on unknown pages.</div>
+      </div>
+
+      <div class="footer">If you believe this is a mistake, contact your Security Team.</div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal-back" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <h2>Check-In Complete! ✅</h2>
+      <p>
+        Thank you! Your check-in has been successfully recorded.<br>
+        We will contact you within <span style="color:#e94e77; font-weight:bold;">24 hours</span>.
+      </p>
+      <p style="font-size:13px; color:#6b7280; margin-top:10px;">
+        Tip: Always hover over links in emails and check the sender address before clicking. Thank You!
+      </p>
+      <button class="ok" onclick="closeModal()">Understood</button>
+    </div>
+  </div>
+
+  <script>
+    // show current time
+    document.getElementById('tm').textContent = new Date().toLocaleString();
+
+    function handleSubmit(e){
+      e.preventDefault();
+      const modal = document.getElementById('modal');
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+
+      document.getElementById('user').value = '';
+      document.getElementById('pass').value = '';
+
+      console.info("[SIMULATION] form submitted — no data transmitted (local test).");
+      return false;
+    }
+
+    function closeModal(){
+      const modal = document.getElementById('modal');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    document.addEventListener('keydown', function(ev){
+      if(ev.key === 'Escape'){
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
